@@ -1,0 +1,74 @@
+output: default
+streamtags: []
+groups:
+  OgDHqy:
+    name: 1. Drop, Sample, Suppress
+    description: Drop, sample or suppress events based on event_actions set in
+      1password_audit_events.csv lookup. To modify please click Knowledge >
+      Lookups > 1password_audit_events.csv inside the pack.
+    index: 3
+  rA3Bo0:
+    name: Remove duplicate fields
+    index: 4
+    description: Removes duplicate fields from event
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: This conditioning pipeline is for use on the 1Password Rest Audit
+        Events api endpoint. This pipeline will provide optional reduction
+        functions available.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: For additional details, see this pack's README under Settings.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: drop
+    filter: __event_action == 'drop'
+    disabled: null
+    conf: {}
+    groupId: OgDHqy
+    description: Drop events based on event action specified in 1password_audit_events.csv
+  - id: sampling
+    filter: __event_action == 'sample'
+    disabled: null
+    conf:
+      rules:
+        - filter: "true"
+          rate: 10
+    groupId: OgDHqy
+    description: Sample events based on event action specified in
+      1password_audit_events.csv. Default value is 1:10 ratio, but can be
+      configured otherwise.
+  - id: suppress
+    filter: __event_action == 'suppress'
+    disabled: null
+    conf:
+      allow: 1
+      suppressPeriodSec: 30
+      dropEventsMode: true
+      maxCacheSize: 50000
+      cacheIdleTimeoutPeriods: 2
+      numEventsIdleTimeoutTrigger: 10000
+      keyExpr: "`${action}:${object_type}`"
+    groupId: OgDHqy
+    description: Suppress events based on event action specified in
+      1password_audit_events.csv
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add: []
+      remove:
+        - actor_details.uuid
+        - session.uuid
+        - aux_details.uuid
+    groupId: rA3Bo0
+description: Pipeline for applying reductions to 1Password events.

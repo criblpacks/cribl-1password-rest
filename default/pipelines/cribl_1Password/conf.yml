@@ -1,0 +1,153 @@
+output: default
+streamtags: []
+groups:
+  SbRroP:
+    name: Initial Parsing and Timestamping
+    description: Parses the JSON object so that we can start working with the
+      fields, sets _time to the correct value
+    index: 3
+  SDNEgH:
+    name: (Optional) Reduction Pipeline
+    description: Pass the events through the reduction pipelines to handle event reductions.
+    index: 4
+    disabled: true
+  KsiiV5:
+    name: Outputs
+    description: Select the output required, if nothing enabled standard JSON will be sent
+    index: 5
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: >-
+        This conditioning pipeline is for use on the 1Password Rest Audit Events
+        api endpoint. The Pack will normalize the JSON data from the collector
+        and provide optional reduction techniques. 
+
+
+        There are three current available output formats for the data: 
+            1. Standard JSON that is formatted and timestamp normalized. 
+            2. OCSF
+            3. Splunk, Index and sourcetype can be changed within the pipeline, however default values are set in Knowledge > Variables
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: For additional details, see this pack's README under Settings.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: serde
+    filter: "true"
+    disabled: null
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      fieldFilterExpr: value !== '' && value !== null
+    description: Parse the JSON from _raw
+    groupId: SbRroP
+  - id: auto_timestamp
+    filter: "true"
+    disabled: null
+    conf:
+      srcField: timestamp
+      dstField: _time
+      defaultTimezone: UTC
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    groupId: SbRroP
+  - id: lookup
+    filter: "true"
+    disabled: null
+    conf:
+      dbLookup: false
+      matchMode: exact
+      reloadPeriodSec: -1
+      inFields:
+        - eventField: action
+          lookupField: action
+        - eventField: object_type
+          lookupField: object_type
+      addToEvent: false
+      ignoreCase: false
+      file: 1password_audit_events.csv
+      outFields:
+        - lookupField: ocsf_category
+          eventField: __ocsf_category
+        - lookupField: event_action
+          eventField: __event_action
+    groupId: SbRroP
+    description: Appends the __ocsf_category and __action to the event
+  - id: chain
+    filter: "true"
+    disabled: true
+    conf:
+      processor: cribl_1Password_reductions
+    description: (Optional) Pass the events through the reduction pipelines to
+      handle event reductions.
+    groupId: SDNEgH
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Output to OCSF (AWS Security Lake)
+    groupId: KsiiV5
+  - id: chain
+    filter: "true"
+    disabled: true
+    conf:
+      processor: cribl_1Password_ocsf
+    description: OCSF Formatting
+    groupId: KsiiV5
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Output to Splunk
+    groupId: KsiiV5
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!_*"
+        - "!cribl*"
+        - "!source"
+        - "!host"
+        - "*"
+    groupId: KsiiV5
+    description: Serialize JSON to _raw
+  - id: eval
+    filter: "true"
+    disabled: true
+    conf:
+      add:
+        - disabled: false
+          value: "index ? index : C.vars.default_splunk_index"
+          name: index
+        - disabled: false
+          value: "sourcetype ? sourcetype : C.vars.default_splunk_sourcetype"
+          name: sourcetype
+      keep:
+        - _*
+        - cribl*
+        - source
+        - host
+        - index
+        - sourcetype
+      remove:
+        - "*"
+    groupId: KsiiV5
+    description: Sets the index and sourcetype for Splunk output
+description: Pipeline for parsing, formatting and filtering 1Password Rest API events.
