@@ -18,6 +18,6 @@ jobs:
 
       - name: Upload pack to Packs Dispensary
         run: |
-          curl --location '${{ vars.DISPENSARY_ENDPOINT }}' \
+          curl --location '${{ vars.DISPENSARY_ENDPOINT }}/${{ github.event.repository.name }}' \
             --header 'Authorization: Bearer ${{ secrets.PACKS_API_TOKEN }}' \
             --form "file=@/tmp/${{ github.event.repository.name }}-${{ env.GITHUB_SHA_SHORT }}-${{ env.GITHUB_REF_SLUG_CS }}.crbl" \
