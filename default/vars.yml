@@ -1,0 +1,8 @@
+default_splunk_index:
+  type: string
+  lib: custom
+  value: "'1password'"
+default_splunk_sourcetype:
+  type: string
+  lib: custom
+  value: "'1password:auditevents'"

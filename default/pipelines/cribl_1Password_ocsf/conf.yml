@@ -1,0 +1,311 @@
+output: default
+streamtags: []
+groups:
+  bege5a:
+    name: OCSF Common
+    description: Common values regardless of OCSF Category
+    index: 3
+  hlHfcy:
+    name: Account Change (3001)
+    description: OCSF Schema Conversion for events related to Account Change (3001)
+    index: 4
+  jKsut3:
+    name: Entity Management (3004)
+    description: OCSF Schema Conversion for events related to Entity Management (3004)
+    index: 5
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: This conditioning pipeline is for use on the 1Password Rest Audit
+        Events api endpoint. This pipeline will convert the event fields to the
+        proper OCSF format.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: For additional details, see this pack's README under Settings.
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: time
+          value: new Date(timestamp).toISOString()
+        - disabled: false
+          name: metadata
+          value: "{}"
+        - disabled: false
+          name: metadata.version
+          value: "'1.4.0'"
+        - disabled: false
+          name: metadata.product
+          value: "{}"
+        - disabled: false
+          name: metadata.product.name
+          value: "'1Password Audit Event'"
+        - disabled: false
+          name: metadata.product.vendor_name
+          value: "'1Password'"
+        - disabled: false
+          name: metadata.original_time
+          value: timestamp
+        - disabled: false
+          name: metadata.uid
+          value: uuid
+        - disabled: false
+          name: severity_id
+          value: "0"
+        - disabled: false
+          name: class_uid
+          value: __ocsf_category
+        - disabled: false
+          name: category_uid
+          value: Number(String(__ocsf_category)[0])
+      keep:
+        - metadata*
+        - time
+        - severity_id
+        - class_uid
+        - category_uid
+    groupId: bege5a
+    description: Common values regardless of OCSF Category
+  - id: eval
+    filter: __ocsf_category == '3001'
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: activity_id
+          value: "99"
+        - disabled: false
+          name: actor
+          value: "{}"
+        - disabled: false
+          name: actor.user
+          value: "{}"
+        - disabled: false
+          name: actor.user.uid
+          value: actor_uuid
+        - disabled: false
+          name: actor.user.name
+          value: actor_details.name
+        - disabled: false
+          name: actor.user.email_addr
+          value: actor_details.email
+        - disabled: false
+          name: user
+          value: "{}"
+        - disabled: false
+          name: user.uid
+          value: object_uuid
+        - disabled: false
+          name: user.name
+          value: object_details.name
+        - disabled: false
+          name: user.email_addr
+          value: object_details.email
+        - disabled: false
+          name: status_id
+          value: "0"
+        - disabled: false
+          name: status
+          value: "'Unknown'"
+        - disabled: false
+          name: type_uid
+          value: class_uid * 100 + activity_id
+        - disabled: false
+          name: unmapped
+          value: "{}"
+        - disabled: false
+          name: unmapped.action
+          value: action
+        - disabled: false
+          name: unmapped.object_type
+          value: object_type
+        - disabled: false
+          name: unmapped.actor_type
+          value: actor_type
+        - disabled: false
+          name: src_endpoint
+          value: "{}"
+        - disabled: false
+          name: src_endpoint.ip
+          value: session.ip
+        - disabled: false
+          name: src_endpoint.uid
+          value: session.device_uuid
+        - disabled: false
+          name: src_endpoint.location
+          value: "{}"
+        - disabled: false
+          name: src_endpoint.location.lat
+          value: location.latitude
+        - disabled: false
+          name: src_endpoint.location.city
+          value: location.city
+        - disabled: false
+          name: src_endpoint.location.long
+          value: location.longitude
+        - disabled: false
+          name: src_endpoint.location.region
+          value: location.region
+        - disabled: false
+          name: src_endpoint.location.country
+          value: location.country
+      keep:
+        - metadata*
+        - time
+        - severity_id
+        - class_uid
+        - category_uid
+        - activity_id
+        - actor.*
+        - user*
+        - status_id
+        - status
+        - type_uid
+        - unmapped*
+        - src_endpoint*
+        - cribl*
+        - host
+        - source
+        - _time
+      remove:
+        - "*"
+    groupId: hlHfcy
+    description: OCSF Schema Conversion for events related to Account Change (3001)
+  - id: eval
+    filter: __ocsf_category == '3004'
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: actor
+          value: "{}"
+        - disabled: false
+          name: actor.user
+          value: "{}"
+        - disabled: false
+          name: actor.user.uid
+          value: actor_uuid
+        - disabled: false
+          name: actor.user.name
+          value: actor_details.name
+        - disabled: false
+          name: actor.user.email_addr
+          value: actor_details.email
+        - disabled: false
+          name: actor.session
+          value: "{}"
+        - disabled: false
+          name: actor.sesssion.uid
+          value: aux_uuid
+        - disabled: false
+          name: actor.session.created_time
+          value: session.login_time
+        - disabled: false
+          name: entity
+          value: "{}"
+        - disabled: false
+          name: entity.uid
+          value: "aux_details ? aux_uuid : object_details ? object_uuid : actor_uuid"
+        - disabled: false
+          name: entity.name
+          value: "aux_details ? aux_details.name : object_details ? object_details.name :
+            actor_details.name"
+        - disabled: false
+          name: entity.type_id
+          value: "object_type == 'device' ? 1 : object_type == 'user' ? 2 : (object_type
+            == 'group' || object_type == 'gm') ? 3 : object_type == 'ec' ? 6 :
+            99"
+        - disabled: false
+          name: entity.type
+          value: "entity.type_id == 0 ? 'Unknown' : entity.type_id == 1 ? 'Device' :
+            entity.type_id == 2 ? 'User' : entity.type_id == 3 ? 'Group' :
+            entity.type_id == 4 ? 'Organization' : entity.type_id == 5 ?
+            'Policy' : entity.type_id == 6 ? 'Email' : 'Other'"
+        - disabled: false
+          name: unmapped
+          value: "{}"
+        - disabled: false
+          name: unmapped.action
+          value: action
+        - disabled: false
+          name: unmapped.object_type
+          value: object_type
+        - disabled: false
+          name: unmapped.account_uuid
+          value: account_uuid
+        - disabled: false
+          name: unmapped.actor_type
+          value: actor_type
+        - disabled: false
+          name: status_id
+          value: "0"
+        - disabled: false
+          name: status
+          value: "'Unknown'"
+        - disabled: false
+          value: "action == 'create' ? 1 : action == 'update' ? 3 : action == 'delete' ? 4
+            : action.startsWith('enbl') ? 8 : action.startsWith('disbl') ? 9 :
+            action == 'activate' ? 10 : action == 'suspend' ? 12 : 99"
+          name: activity_id
+        - disabled: false
+          name: type_uid
+          value: class_uid * 100 + activity_id
+        - disabled: false
+          name: src_endpoint
+          value: "{}"
+        - disabled: false
+          name: src_endpoint.ip
+          value: session.ip
+        - disabled: false
+          name: src_endpoint.location
+          value: "{}"
+        - disabled: false
+          name: src_endpoint.location.lat
+          value: location.latitude
+        - disabled: false
+          name: src_endpoint.location.city
+          value: location.city
+        - disabled: false
+          name: src_endpoint.location.long
+          value: location.longitude
+        - disabled: false
+          name: src_endpoint.location.region
+          value: location.region
+        - disabled: false
+          name: src_endpoint.location.country
+          value: location.country
+      keep:
+        - time
+        - metadata*
+        - actor.*
+        - entity*
+        - unmapped*
+        - status
+        - status_id
+        - activity_id
+        - type_uid
+        - src_endpoint*
+        - severity_id
+        - class_uid
+        - category_uid
+        - cribl*
+        - host
+        - source
+        - _time
+      remove:
+        - "*"
+    groupId: jKsut3
+    description: OCSF Schema Conversion for events related to Entity Management (3004)
+description: Pipeline for formatting 1Password events into OCSF Schema
