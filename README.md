@@ -1,4 +1,4 @@
-# 1Password Rest Collector
+# 1Password Rest Collector IO
 ----
 
 ## About this Pack

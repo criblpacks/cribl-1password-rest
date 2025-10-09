@@ -16,7 +16,7 @@ routes:
     description: 1Password Audit Events
     enableOutputExpression: false
     outputExpression: null
-    filter: source.includes('auditevents')
+    filter: __packsource == 'cribl-1password-rest-io.1password-audit-api'
     clones: []
     output: default
   - id: default
