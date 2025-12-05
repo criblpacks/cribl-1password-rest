@@ -6,3 +6,8 @@ default_splunk_sourcetype:
   type: string
   lib: custom
   value: "'1password:auditevents'"
+1password_bearer:
+  type: string
+  lib: custom
+  value: "'YOUR_1PASSWORD_TOKEN'"
+  description: "REQUIRED: Your 1Password API Token"

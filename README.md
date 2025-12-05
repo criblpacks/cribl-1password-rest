@@ -18,41 +18,19 @@ The pack also currently includes three forms of outputs:
 
 The 1Password Rest pack allows for events to be sent from the Audit Events API endpoint and normalized into the proper format for the required destinations. To use this pack, follow these steps:
 
-## 1. Configure the Pack
+## Configure the Pack
 
 This pack includes several functions that can help reduce events. Please make sure you evaluate the functions before enabling to ensure vital data is not missed.
 
 Additionally, several output formats are available to be selected. Please only enable one output, as enabling multiple may break the output formatting.
 
-## 2. Configure the Event Breaker Rule
+Add you Bearer token for the API call under Knowledge > Variables > 1password_bearer.
 
-The Event Breaker strips headers from events, leaving only the records of interest and capturing timestamps properly. You will have a single event for each unique record. The event breaker is configured to set the timestamp equal to the 'timestamp' field within each event.
-
-- Navigate to Manage > Processing > Knowledge > Event Breaker Rules.
-- Click Add Ruleset.
-- Click Manage as JSON at lower left.
-- Paste the Event Breaker Ruleset JSON from Appendix A below into the window.
-- Click OK.
-
-## 3. Configure the Rest Collector Source
-
-From the top nav of a Cribl Stream instance or Group, select Data > Sources, then select Collectors > REST from the Data Sources page's tiles or the Sources left nav. Click Add Collector to open the REST > New Collector modal.
-
-- Click Configure as JSON to open the configuration editor.
-- Paste the Rest Collector JSON from Appendix B below into the window.
-- Click Configure Collector in the upper left.
-- Enter the value for Collect URL based on info in the above API reference. Example: 'https://events.1password.com/api/v2/auditevents'.
-- Enter the value for the Collect header field named Authorization. Example: 'Bearer eYk4hkj3hk3h423424...........'
-- Click Save.
-
-## 4. Connect the pack
-
-Connect the pack to the 1Password Rest Collector on the Global Routes page where you can add a new route. 
-
-- specify a filter expression for the new 1Password rest collector source. Example: `__inputId.includes('1Password')`
-- choose the cribl-1password-rest pack in the Pipeline dropdown.
 
 ## Release Notes
+
+### Version 0.1.1
+Adding variables and configuring the source to use them.
 
 ### Version 0.1.0
 Initial release

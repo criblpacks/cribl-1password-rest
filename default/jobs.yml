@@ -1,4 +1,4 @@
-1Password:
+in_1password_audit:
   type: collection
   ttl: 4h
   ignoreGroupJobsLimit: false
@@ -49,6 +49,7 @@
       decodeUrl: false
       rejectUnauthorized: true
       captureHeaders: false
+      stopOnEmptyResults: false
       safeHeaders: []
       retryRules:
         type: backoff
@@ -93,7 +94,7 @@
     metadata:
       - name: __packsource
         value: "'cribl-1password-rest-io.1password-audit-api'"
-  description: This uses the 1Password Events API to retrieve information about
+  description: Uses the 1Password Events API to retrieve information about
     activity in your 1Password account – like audit events, item usage, and
     sign-in attempts – and send it to your security information and event
     management (SIEM) system.
